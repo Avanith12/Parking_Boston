@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boston Through Parking</title>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+    <header class="hero">
+        <div class="hero-inner">
+            <p class="eyebrow">Web-Based Data Story</p>
+            <h1>Boston Through Parking</h1>
+            <p class="hero-subtitle">
+                A black-and-white visual story of urban activity using Boston monthly parking transactions by zone.
+            </p>
+        </div>
+    </header>
+
+    <main>
+        <section class="section intro fade">
+            <div class="section-text">
+                <h2>What this dataset captures</h2>
+                <p>
+                    This dataset records monthly parking transactions for 572 Boston zones. Each row corresponds to a
+                    street segment or zone, and each value reflects how many parking transactions occurred there during
+                    a given month. In practice, these counts can act as a proxy for urban movement. Higher transaction
+                    counts suggest stronger activity, whether from work commutes, shopping, or other city use. The
+                    analysis reveals two important realities at once: Boston becomes dramatically busier from winter
+                    into summer, and the dataset itself contains missing months later in the year. Together, those
+                    features make it a strong case study for storytelling with real-world data.
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Zones</span>
+                    <span class="stat-value">572</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Transactions</span>
+                    <span class="stat-value">210,044</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Peak Month</span>
+                    <span class="stat-value">June</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Peak Month Total</span>
+                    <span class="stat-value">78,789</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Lowest Non-Zero Month</span>
+                    <span class="stat-value">January</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Top 10 Share</span>
+                    <span class="stat-value">14.35%</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>1. Activity over time</h2>
+                <p>
+                    The monthly totals show a strong upward trajectory from January through June. Activity begins at
+                    just 2,135 transactions in January, rises steadily through spring, and peaks at 78,789 in June. July
+                    remains high at 35,501 but drops sharply after the June peak. August and the remaining later months
+                    appear as zero in this dataset, which suggests missing data rather than a true collapse in urban
+                    activity. This chart establishes the central rhythm of the story: city movement grows as the weather
+                    improves, and the dataset records that shift very clearly during the first seven months of the year.
+                </p>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>2. Month-to-month change</h2>
+                <p>
+                    Looking at change rather than raw totals makes the acceleration even clearer. February grows by
+                    2,587 compared with January, March adds another 5,017, and April jumps by 22,633. The rise continues
+                    into May and then surges again into June, which adds 31,998 transactions over May. This makes June
+                    the key turning point in the dataset. The negative changes afterward are also informative, although
+                    they must be interpreted carefully because August onward is missing. This view is useful because it
+                    shows not only that Boston gets busier over time, but also exactly when the largest shifts in city
+                    activity occur.
+                </p>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="deltaChart"></canvas>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>3. Seasonal comparison</h2>
+                <p>
+                    Seasonal averages make the contrast especially strong. Winter averages about 5.99 transactions per
+                    zone per month, spring rises to about 51.81, and summer reaches about 66.60. Even with missing data
+                    later in summer, the pattern is still unmistakable: Boston is far more active in warmer months. This
+                    is one of the clearest insights in the project because it connects the parking data to human
+                    behavior. Seasonal weather, tourism, and daily mobility likely all contribute to this rise. The city
+                    does not simply become slightly busier in summer. It becomes dramatically more active compared with
+                    the winter baseline.
+                </p>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="seasonChart"></canvas>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>4. Where activity concentrates</h2>
+                <p>
+                    Parking activity is not evenly distributed across Boston. The ten busiest zones alone account for
+                    14.35% of all transactions in the dataset, which is a large share given there are 572 zones in
+                    total. This concentration suggests that a relatively small set of streets functions as recurring
+                    urban hotspots. Many of the highest-ranked segments are clustered around Newbury and Boylston
+                    streets, reinforcing the idea that commercial and highly visited areas dominate usage. This chart
+                    does not just identify the busiest locations. It shows that Boston’s parking landscape is structured
+                    around a few especially active corridors rather than being spread uniformly across the city.
+                </p>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="topZonesChart"></canvas>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>5. The quietest zones</h2>
+                <p>
+                    The bottom of the distribution is just as revealing as the top. Several zones record zero total
+                    transactions, while a handful of others record only one transaction across the whole dataset. This
+                    stark contrast shows how uneven urban usage can be. Some street segments operate as daily magnets
+                    for movement, while others barely register at all. Those low values may reflect residential
+                    character, lower demand, incomplete coverage, or operational differences in how parking was
+                    recorded. Including the least active zones strengthens the story because it makes the concentration
+                    at the top more meaningful. Boston’s parking activity is not simply high or low. It is highly
+                    uneven.
+                </p>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="bottomZonesChart"></canvas>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>6. How the top zones behave over time</h2>
+                <p>
+                    The five busiest zones do not all follow exactly the same monthly pattern, but they all rise
+                    strongly into spring and early summer. North Charles between Boylston and Beacon peaks at 841 in
+                    June, while South Newbury between Mass and Charlesgate East rises especially sharply, reaching 1,289
+                    in June after almost no winter activity. This makes the chart useful for comparing consistency
+                    versus seasonality. Some zones are already active early in the year, while others explode later.
+                    Together, these trajectories suggest that even among Boston’s busiest streets, there are different
+                    types of urban behavior: stable corridors, sharply seasonal areas, and strong spring-to-summer
+                    climbers.
+                </p>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="top5TrendChart"></canvas>
+            </div>
+        </section>
+
+        <section class="section fade dual">
+            <div class="panel">
+                <div class="section-text small">
+                    <h2>7. Who peaks when?</h2>
+                    <p>
+                        Most zones reach their highest recorded month in June. In fact, 421 of the 572 zones peak there.
+                        That number is much larger than any other month and reinforces the importance of June as the
+                        central high-activity moment in the dataset. July is next but far behind, while April and May
+                        capture smaller groups of zones. Only three zones peak in January. This distribution matters
+                        because it shows that the seasonal story is not driven by just a few outliers. A very large
+                        share of the city follows the same general pattern: movement builds steadily and reaches its
+                        strongest point in early summer.
+                    </p>
+                </div>
+                <div class="chart-wrap compact">
+                    <canvas id="peakMonthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="section-text small">
+                    <h2>8. Share of activity</h2>
+                    <p>
+                        A doughnut view makes the concentration of activity easy to read. The top ten zones contribute
+                        14.35% of all recorded transactions, while the remaining 562 zones contribute 85.65%. At first
+                        glance that may not seem overwhelming, but given the number of total zones, it is substantial.
+                        This means a tiny fraction of zones carries a disproportionately large share of recorded parking
+                        behavior. The result supports the broader narrative that urban activity clusters spatially. Even
+                        within a city as complex as Boston, movement and parking demand are not distributed equally.
+                        They accumulate in a few strong and repeatedly used locations.
+                    </p>
+                </div>
+                <div class="chart-wrap compact">
+                    <canvas id="shareChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="section fade">
+            <div class="section-text">
+                <h2>9. Spatial perspective</h2>
+                <p>
+                    A map adds geographic context to the patterns shown above. The dataset itself does not include
+                    coordinates, so the points below are illustrative placements centered around the Back Bay and nearby
+                    Boston areas associated with the top-ranked street segments. Even so, the map is useful because it
+                    grounds the story in physical space. Rather than reading the zones as abstract names, viewers can
+                    place them in relation to the city. This strengthens the interpretation that much of the strongest
+                    activity is tied to dense and highly visited parts of Boston. Spatial framing helps transform a
+                    table of transactions into a narrative about urban geography.
+                </p>
+            </div>
+            <div class="map-note">Map markers are illustrative because the dataset does not include lat/long
+                coordinates.</div>
+            <div id="map"></div>
+        </section>
+
+        <section class="section fade highlight">
+            <div class="section-text">
+                <h2>10. Data limitations matter</h2>
+                <p>
+                    One of the most important findings in this project is not about traffic or hotspots. It is about
+                    data quality. August through December appear as zero in the monthly totals, and the notebook
+                    confirms that September, October, and November sum to zero. That pattern is unrealistic for a major
+                    city and strongly suggests missing or incomplete reporting rather than true inactivity. This is a
+                    valuable storytelling moment because real-world analysis is never just about making charts. It also
+                    requires evaluating what the dataset can and cannot support. In this case, the strongest conclusions
+                    come from January through July, while the later months must be interpreted with caution.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Boston Monthly Parking Transactions by Zone · Storytelling site built with HTML, CSS, JavaScript, Chart.js,
+            and Leaflet</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
